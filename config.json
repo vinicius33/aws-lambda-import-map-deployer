@@ -1,0 +1,11 @@
+{
+  "username": "admin",
+  "password": "qazwsx",
+  "manifestFormat": "importmap",
+  "region": "eu-west-1",
+  "locations": {
+    "default": "import-map.json",
+    "prod": "s3://mfe-portal-3c8600/import-map.json",
+    "test": "s3://mfe-portal-3c8600/import-map-test.json"
+  }
+}

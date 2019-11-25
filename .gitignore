@@ -3,10 +3,6 @@ sofe-manifest.json
 sofe-manifest.js
 import-map.json
 
-# default config file
-config.json
-
-
 # Logs
 logs
 *.log
