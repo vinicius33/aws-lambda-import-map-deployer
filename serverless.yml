@@ -1,0 +1,23 @@
+service: import-map-deployer
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, 'dev'}
+  region: eu-west-1
+
+package:
+  exclude:
+    - "bin/*"
+    - "examples/**"
+    - "spec/**"
+    - ".vscode/**"
+    - "*"
+
+functions:
+  http:
+    handler: src/handler.http
+    timeout: 2
+    events:
+      - http: ANY /
+      - http: ANY /{proxy+}
