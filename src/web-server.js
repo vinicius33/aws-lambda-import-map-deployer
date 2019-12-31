@@ -3,6 +3,7 @@
 
 const express = require("express"),
   bodyParser = require("body-parser"),
+  cors = require("cors"),
   app = express(),
   ioOperations = require("./io-operations.js"),
   modify = require("./modify.js"),
@@ -34,7 +35,9 @@ app.use(
     ].join(" ");
   })
 );
+
 app.use(auth);
+app.use(cors());
 app.use(express.static(__dirname + "/public"));
 
 function getEnv(req) {

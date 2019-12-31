@@ -1,10 +1,7 @@
 service: import-map-deployer
 
-provider:
-  name: aws
-  runtime: nodejs8.10
-  stage: ${opt:stage, 'dev'}
-  region: eu-west-1
+custom:
+  bucket: "mfe-portal-3c8600"
 
 package:
   exclude:
@@ -13,6 +10,20 @@ package:
     - "spec/**"
     - ".vscode/**"
     - "*"
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, 'dev'}
+  region: eu-west-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "arn:aws:s3:::${self:custom.bucket}/*"
+
+plugins:
+  - serverless-offline
 
 functions:
   http:

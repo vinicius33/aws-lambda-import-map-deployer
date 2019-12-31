@@ -2,11 +2,10 @@
   "name": "sofe-deplanifester",
   "version": "0.2.0",
   "description": "a manifest deployer for sofe",
-  "main": "src/handler.js",
   "scripts": {
     "test": "rm -f sofe-manifest.json && jasmine",
-    "start": "node src/handler.js",
-    "deploy": "serverless deploy"
+    "dev": "sls offline start --port 4500",
+    "deploy": "sls deploy"
   },
   "repository": {
     "type": "git",
@@ -33,13 +32,15 @@
     "minimist": "^1.2.0",
     "morgan": "^1.8.1",
     "request": "^2.79.0",
-    "rwlock": "^5.0.0"
+    "rwlock": "^5.0.0",
+    "serverless-http": "^2.3.0"
   },
   "devDependencies": {
     "jasmine": "^2.4.1",
     "node-static": "^0.7.9",
     "serverless": "^1.60.4",
-    "serverless-http": "^2.3.0",
+    "serverless-basic-authentication": "^0.14.1",
+    "serverless-offline": "^5.12.1",
     "superagent": "^1.6.1"
   },
   "publishConfig": {

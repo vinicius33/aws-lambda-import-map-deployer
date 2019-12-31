@@ -3,6 +3,8 @@ sofe-manifest.json
 sofe-manifest.js
 import-map.json
 
+.serverless
+
 # Logs
 logs
 *.log
