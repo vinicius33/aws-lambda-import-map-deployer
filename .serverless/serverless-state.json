@@ -172,10 +172,10 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/import-map-deployer/dev/1577812072622-2019-12-31T17:07:52.622Z/import-map-deployer.zip"
+                "S3Key": "serverless/import-map-deployer/dev/1577899892127-2020-01-01T17:31:32.127Z/import-map-deployer.zip"
               },
               "FunctionName": "import-map-deployer-dev-http",
-              "Handler": "src/handler.http",
+              "Handler": "src/lambda.handler",
               "MemorySize": 1024,
               "Role": {
                 "Fn::GetAtt": [
@@ -191,14 +191,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "HttpLambdaVersionuAglsOHRoyENwibd3oFyFZOukSxk2WwilmxvHXUnyGI": {
+          "HttpLambdaVersionEkWxgT8zD2QVCYclwaggDhPdSsMq5TN0SwbtQOsbw": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "HttpLambdaFunction"
               },
-              "CodeSha256": "DvBXehmy2lMApGrr18rS0ae7/vteqhfg+aS11UAQH6w="
+              "CodeSha256": "z/uymwiKw+TxZ7SIFCL5h5GHcli0EUpyBasezE2v/Z4="
             }
           },
           "ApiGatewayRestApi": {
@@ -316,7 +316,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1577812063138": {
+          "ApiGatewayDeployment1577899865174": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -383,7 +383,7 @@
           "HttpLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "HttpLambdaVersionuAglsOHRoyENwibd3oFyFZOukSxk2WwilmxvHXUnyGI"
+              "Ref": "HttpLambdaVersionEkWxgT8zD2QVCYclwaggDhPdSsMq5TN0SwbtQOsbw"
             }
           },
           "ServiceEndpoint": {
@@ -484,12 +484,13 @@
       "bucket": "mfe-portal-3c8600"
     },
     "plugins": [
-      "serverless-offline"
+      "serverless-offline",
+      "serverless-plugin-typescript"
     ],
     "pluginsData": {},
     "functions": {
       "http": {
-        "handler": "src/handler.http",
+        "handler": "src/lambda.handler",
         "timeout": 2,
         "events": [
           {
@@ -500,19 +501,24 @@
           }
         ],
         "name": "import-map-deployer-dev-http",
-        "package": {},
+        "package": {
+          "exclude": [
+            "node_modules/serverless-plugin-typescript"
+          ],
+          "include": []
+        },
         "memory": 1024,
         "runtime": "nodejs8.10",
         "vpc": {},
-        "versionLogicalId": "HttpLambdaVersionuAglsOHRoyENwibd3oFyFZOukSxk2WwilmxvHXUnyGI"
+        "versionLogicalId": "HttpLambdaVersionEkWxgT8zD2QVCYclwaggDhPdSsMq5TN0SwbtQOsbw"
       }
     },
     "serviceFilename": "serverless.yml",
     "layers": {},
-    "artifact": "/Users/viniciussouza/Projects/import-map-deployer/.serverless/import-map-deployer.zip"
+    "artifact": "/Users/viniciussouza/Projects/import-map-deployer/.build/.serverless/import-map-deployer.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/import-map-deployer/dev/1577812072622-2019-12-31T17:07:52.622Z",
+    "artifactDirectoryName": "serverless/import-map-deployer/dev/1577899892127-2020-01-01T17:31:32.127Z",
     "artifact": "import-map-deployer.zip"
   }
 }
