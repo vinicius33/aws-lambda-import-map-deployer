@@ -1,5 +1,5 @@
 import serverless from 'serverless-http';
-import { app } from './web-server';
+import { app } from '../web-server';
 
 const server = serverless(app);
 

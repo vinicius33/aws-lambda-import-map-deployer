@@ -27,9 +27,30 @@ plugins:
   - serverless-plugin-typescript
 
 functions:
+  authorizer:
+    handler: src/handlers/authorizer.handler
   http:
-    handler: src/lambda.handler
+    handler: src/handlers/express.handler
     timeout: 2
     events:
       - http: ANY /
-      - http: ANY /{proxy+}
+      - http:
+          path: /{proxy+}
+          method: ANY
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
+            type: request
+
+resources:
+  Resources:
+    GatewayResponse:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.WWW-Authenticate: "'Basic'"
+        ResponseType: UNAUTHORIZED
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+        StatusCode: '401'

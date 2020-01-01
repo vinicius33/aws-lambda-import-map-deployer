@@ -1,7 +1,8 @@
 {
   "manifestFormat": "importmap",
   "region": "eu-west-1",
-  "s3Endpoint": "",
+  "username": "d4rthv4d3r",
+  "password": "D^Ym83zR92q79kOzf*n",
   "locations": {
     "default": "s3://mfe-portal-3c8600/import-map-dev.json",
     "prod": "s3://mfe-portal-3c8600/import-map.json",
