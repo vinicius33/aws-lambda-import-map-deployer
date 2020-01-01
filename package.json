@@ -1,25 +1,11 @@
 {
-  "name": "sofe-deplanifester",
-  "version": "0.2.0",
-  "description": "a manifest deployer for sofe",
+  "name": "import-map-deployer",
+  "version": "0.0.1",
+  "description": "a manifest deployer for systemjs",
   "scripts": {
-    "test": "rm -f sofe-manifest.json && jasmine",
     "dev": "sls offline start --port 4500",
     "deploy": "sls deploy"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CanopyTax/sofe-deplanifester.git"
-  },
-  "keywords": [
-    "sofe"
-  ],
-  "author": "nhumrich",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/CanopyTax/sofe-deplanifester/issues"
-  },
-  "homepage": "https://github.com/CanopyTax/sofe-deplanifester#readme",
   "dependencies": {
     "@google-cloud/storage": "^3.0.3",
     "aws-sdk": "^2.2.27",
@@ -36,12 +22,17 @@
     "serverless-http": "^2.3.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.2",
+    "@types/morgan": "^1.7.37",
     "jasmine": "^2.4.1",
     "node-static": "^0.7.9",
     "serverless": "^1.60.4",
     "serverless-basic-authentication": "^0.14.1",
     "serverless-offline": "^5.12.1",
-    "superagent": "^1.6.1"
+    "serverless-plugin-typescript": "^1.1.9",
+    "superagent": "^1.6.1",
+    "typescript": "^3.7.4"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

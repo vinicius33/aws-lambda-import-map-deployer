@@ -1,6 +1,7 @@
 {
   "manifestFormat": "importmap",
   "region": "eu-west-1",
+  "s3Endpoint": "",
   "locations": {
     "default": "s3://mfe-portal-3c8600/import-map-dev.json",
     "prod": "s3://mfe-portal-3c8600/import-map.json",

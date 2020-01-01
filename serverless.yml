@@ -1,15 +1,15 @@
 service: import-map-deployer
 
 custom:
-  bucket: "mfe-portal-3c8600"
+  bucket: 'mfe-portal-3c8600'
 
 package:
   exclude:
-    - "bin/*"
-    - "examples/**"
-    - "spec/**"
-    - ".vscode/**"
-    - "*"
+    - 'bin/*'
+    - 'examples/**'
+    - 'spec/**'
+    - '.vscode/**'
+    - '*'
 
 provider:
   name: aws
@@ -20,14 +20,15 @@ provider:
     - Effect: Allow
       Action:
         - s3:*
-      Resource: "arn:aws:s3:::${self:custom.bucket}/*"
+      Resource: 'arn:aws:s3:::${self:custom.bucket}/*'
 
 plugins:
   - serverless-offline
+  - serverless-plugin-typescript
 
 functions:
   http:
-    handler: src/handler.http
+    handler: src/lambda.handler
     timeout: 2
     events:
       - http: ANY /
