@@ -38,10 +38,11 @@ functions:
           path: /{proxy+}
           method: ANY
           cors:
-            origins:
-              - https://*.spezi.app
-              - https://*.choco.com
-              - https://*.clubmate.app
+            origin: '*'
+            # origins:
+            #   - https://*.spezi.app
+            #   - https://*.choco.com
+            #   - https://*.clubmate.app
             maxAge: 86400
           authorizer:
             name: authorizer
