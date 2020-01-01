@@ -37,6 +37,11 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
+          cors:
+            origins:
+              - https://*.spezi.app
+              - https://*.choco.com
+              - https://*.clubmate.app
           authorizer:
             name: authorizer
             resultTtlInSeconds: 0
@@ -50,6 +55,8 @@ resources:
       Properties:
         ResponseParameters:
           gatewayresponse.header.WWW-Authenticate: "'Basic'"
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
         ResponseType: UNAUTHORIZED
         RestApiId:
           Ref: 'ApiGatewayRestApi'

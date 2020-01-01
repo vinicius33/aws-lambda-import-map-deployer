@@ -1,7 +1,8 @@
 import config from '../config.json';
 
 export const handler = (event, _context, callback) => {
-  const authorizationHeader = event.headers.authorization;
+  const authorizationHeader =
+    event.headers.authorization || event.headers.Authorization;
 
   if (!authorizationHeader) return callback('Unauthorized');
 

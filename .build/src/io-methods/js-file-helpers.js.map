@@ -1,1 +1,0 @@
-{"version":3,"file":"js-file-helpers.js","sourceRoot":"","sources":["../../../src/io-methods/js-file-helpers.ts"],"names":[],"mappings":";;AAAa,QAAA,SAAS,GAAG,UAAA,QAAQ;IAC/B,OAAA,QAAQ,CAAC,SAAS,CAAC,CAAC,EAAE,QAAQ,CAAC,WAAW,CAAC,GAAG,CAAC,CAAC,GAAG,KAAK;AAAxD,CAAwD,CAAC;AAE9C,QAAA,cAAc,GAAG,UAAA,kBAAkB;IAC9C,OAAA,qBAAmB,kBAAkB,MAAG;AAAxC,CAAwC,CAAC"}

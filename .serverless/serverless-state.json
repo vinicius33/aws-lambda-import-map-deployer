@@ -79,6 +79,12 @@
               }
             }
           },
+          "AuthorizerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/import-map-deployer-dev-authorizer"
+            }
+          },
           "HttpLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
@@ -165,6 +171,42 @@
               }
             }
           },
+          "AuthorizerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/import-map-deployer/dev/1577910350597-2020-01-01T20:25:50.597Z/import-map-deployer.zip"
+              },
+              "FunctionName": "import-map-deployer-dev-authorizer",
+              "Handler": "src/handlers/authorizer.handler",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "nodejs8.10",
+              "Timeout": 6
+            },
+            "DependsOn": [
+              "AuthorizerLogGroup",
+              "IamRoleLambdaExecution"
+            ]
+          },
+          "AuthorizerLambdaVersionSZsLLovhivHl0pFPAdxjSceKzi9YL8xCDlK1zJLbk": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "AuthorizerLambdaFunction"
+              },
+              "CodeSha256": "ZYD+NXKvEIWE9lekLNxfH7JbV7Dm9utcaVIkI0iHWlU="
+            }
+          },
           "HttpLambdaFunction": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
@@ -172,10 +214,10 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/import-map-deployer/dev/1577899892127-2020-01-01T17:31:32.127Z/import-map-deployer.zip"
+                "S3Key": "serverless/import-map-deployer/dev/1577910350597-2020-01-01T20:25:50.597Z/import-map-deployer.zip"
               },
               "FunctionName": "import-map-deployer-dev-http",
-              "Handler": "src/lambda.handler",
+              "Handler": "src/handlers/express.handler",
               "MemorySize": 1024,
               "Role": {
                 "Fn::GetAtt": [
@@ -191,14 +233,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "HttpLambdaVersionEkWxgT8zD2QVCYclwaggDhPdSsMq5TN0SwbtQOsbw": {
+          "HttpLambdaVersionolg5Cp2SjrCGbbdrxIPoQjFPlN0oSom9kriLbhy7rvg": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "HttpLambdaFunction"
               },
-              "CodeSha256": "z/uymwiKw+TxZ7SIFCL5h5GHcli0EUpyBasezE2v/Z4="
+              "CodeSha256": "ZYD+NXKvEIWE9lekLNxfH7JbV7Dm9utcaVIkI0iHWlU="
             }
           },
           "ApiGatewayRestApi": {
@@ -222,6 +264,51 @@
                 ]
               },
               "PathPart": "{proxy+}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodProxyVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".*\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceProxyVar"
+              },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
@@ -285,7 +372,10 @@
                 "Ref": "ApiGatewayRestApi"
               },
               "ApiKeyRequired": false,
-              "AuthorizationType": "NONE",
+              "AuthorizationType": "CUSTOM",
+              "AuthorizerId": {
+                "Ref": "AuthorizerApiGatewayAuthorizer"
+              },
               "Integration": {
                 "IntegrationHttpMethod": "POST",
                 "Type": "AWS_PROXY",
@@ -314,9 +404,45 @@
                 }
               },
               "MethodResponses": []
+            },
+            "DependsOn": "AuthorizerApiGatewayAuthorizer"
+          },
+          "AuthorizerApiGatewayAuthorizer": {
+            "Type": "AWS::ApiGateway::Authorizer",
+            "Properties": {
+              "AuthorizerResultTtlInSeconds": 0,
+              "IdentitySource": "method.request.header.Authorization",
+              "Name": "authorizer",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "AuthorizerUri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "AuthorizerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              },
+              "Type": "REQUEST"
             }
           },
-          "ApiGatewayDeployment1577899865174": {
+          "ApiGatewayDeployment1577910330008": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -325,6 +451,7 @@
               "StageName": "dev"
             },
             "DependsOn": [
+              "ApiGatewayMethodProxyVarOptions",
               "ApiGatewayMethodAny",
               "ApiGatewayMethodProxyVarAny"
             ]
@@ -372,6 +499,34 @@
                 ]
               }
             }
+          },
+          "AuthorizerLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "AuthorizerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com"
+            }
+          },
+          "GatewayResponse": {
+            "Type": "AWS::ApiGateway::GatewayResponse",
+            "Properties": {
+              "ResponseParameters": {
+                "gatewayresponse.header.WWW-Authenticate": "'Basic'",
+                "gatewayresponse.header.Access-Control-Allow-Origin": "'*'",
+                "gatewayresponse.header.Access-Control-Allow-Headers": "'*'"
+              },
+              "ResponseType": "UNAUTHORIZED",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StatusCode": "401"
+            }
           }
         },
         "Outputs": {
@@ -380,10 +535,16 @@
               "Ref": "ServerlessDeploymentBucket"
             }
           },
+          "AuthorizerLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "AuthorizerLambdaVersionSZsLLovhivHl0pFPAdxjSceKzi9YL8xCDlK1zJLbk"
+            }
+          },
           "HttpLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "HttpLambdaVersionEkWxgT8zD2QVCYclwaggDhPdSsMq5TN0SwbtQOsbw"
+              "Ref": "HttpLambdaVersionolg5Cp2SjrCGbbdrxIPoQjFPlN0oSom9kriLbhy7rvg"
             }
           },
           "ServiceEndpoint": {
@@ -489,15 +650,67 @@
     ],
     "pluginsData": {},
     "functions": {
+      "authorizer": {
+        "handler": "src/handlers/authorizer.handler",
+        "events": [],
+        "name": "import-map-deployer-dev-authorizer",
+        "package": {
+          "exclude": [
+            "node_modules/serverless-plugin-typescript"
+          ],
+          "include": []
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs8.10",
+        "vpc": {},
+        "versionLogicalId": "AuthorizerLambdaVersionSZsLLovhivHl0pFPAdxjSceKzi9YL8xCDlK1zJLbk"
+      },
       "http": {
-        "handler": "src/lambda.handler",
+        "handler": "src/handlers/express.handler",
         "timeout": 2,
         "events": [
           {
             "http": "ANY /"
           },
           {
-            "http": "ANY /{proxy+}"
+            "http": {
+              "path": "{proxy+}",
+              "method": "any",
+              "cors": {
+                "origins": [
+                  "*"
+                ],
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "ANY"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "authorizer": {
+                "type": "request",
+                "name": "authorizer",
+                "arn": {
+                  "Fn::GetAtt": [
+                    "AuthorizerLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "resultTtlInSeconds": 0,
+                "identitySource": "method.request.header.Authorization",
+                "claims": []
+              },
+              "integration": "AWS_PROXY"
+            }
           }
         ],
         "name": "import-map-deployer-dev-http",
@@ -510,15 +723,35 @@
         "memory": 1024,
         "runtime": "nodejs8.10",
         "vpc": {},
-        "versionLogicalId": "HttpLambdaVersionEkWxgT8zD2QVCYclwaggDhPdSsMq5TN0SwbtQOsbw"
+        "versionLogicalId": "HttpLambdaVersionolg5Cp2SjrCGbbdrxIPoQjFPlN0oSom9kriLbhy7rvg"
       }
+    },
+    "resources": {
+      "Resources": {
+        "GatewayResponse": {
+          "Type": "AWS::ApiGateway::GatewayResponse",
+          "Properties": {
+            "ResponseParameters": {
+              "gatewayresponse.header.WWW-Authenticate": "'Basic'",
+              "gatewayresponse.header.Access-Control-Allow-Origin": "'*'",
+              "gatewayresponse.header.Access-Control-Allow-Headers": "'*'"
+            },
+            "ResponseType": "UNAUTHORIZED",
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "StatusCode": "401"
+          }
+        }
+      },
+      "Outputs": {}
     },
     "serviceFilename": "serverless.yml",
     "layers": {},
     "artifact": "/Users/viniciussouza/Projects/import-map-deployer/.build/.serverless/import-map-deployer.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/import-map-deployer/dev/1577899892127-2020-01-01T17:31:32.127Z",
+    "artifactDirectoryName": "serverless/import-map-deployer/dev/1577910350597-2020-01-01T20:25:50.597Z",
     "artifact": "import-map-deployer.zip"
   }
 }
