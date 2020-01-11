@@ -1,14 +1,14 @@
 # aws-lambda-import-map-deployer
-This is application was an experiment based on the original `import-map-deployer`. It does not intend to cover all cases, in fact this is meant to be used only on `aws`.
+This is application was an experiment based on the original `import-map-deployer`. It does not intend to cover all cases, in fact, this is meant to be used only with `AWS`.
 
-Since some companies nowadays are based on top of `serverless architecture` I've migrated what was needed to deploy this app as an `AWS lambda`.
+Since some companies nowadays are based on top of  `serverless architecture`  I've migrated what was needed to deploy this app as an `AWS Lambda`.
 
-This doesn't intend to replace the original `import-map-deployer`.
+FYI, this doesn't intend to replace the original `import-map-deployer` (which is an awesome service).
 
 ## Installation and usage
-`yarn install`
-`yarn start`
-`yarn deploy`
+* `yarn install`
+* `yarn start` spin up a `serverless-offline` and simulate a `API GW event`
+* `yarn deploy` deploy your serverless app based on your `aws account`
 
 ## Configuration file
 The `aws-lambda-import-map-deployer` expects a configuration file to be present so it (1) can password protect deployments, and (2) knows where and how
