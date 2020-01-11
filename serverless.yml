@@ -1,7 +1,7 @@
 service: import-map-deployer
 
 custom:
-  bucket: 'mfe-portal-3c8600'
+  bucket: 'YOUR_BUCKET'
 
 package:
   exclude:
@@ -39,11 +39,8 @@ functions:
           method: ANY
           cors:
             origin: '*'
-            # origins:
-            #   - https://*.spezi.app
-            #   - https://*.choco.com
-            #   - https://*.clubmate.app
-            maxAge: 86400
+            allowCredentials: false
+            cacheControl: 'max-age=600, s-maxage=600, proxy-revalidate'
           authorizer:
             name: authorizer
             resultTtlInSeconds: 0
