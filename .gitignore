@@ -3,6 +3,7 @@ sofe-manifest.json
 sofe-manifest.js
 import-map.json
 
+.DS_Store
 .serverless
 .build
 
