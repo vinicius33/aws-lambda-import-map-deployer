@@ -1,29 +1,18 @@
-# import-map-deployer
-The import-map-deployer is a backend service that updates [import map json files](https://github.com/WICG/import-maps#installation). When using
-import-map-deployer, a frontend deployment is completed in two steps:
+# aws-lambda-import-map-deployer
+This is application was an experiment based on the original `import-map-deployer`. It does not intend to cover all cases, in fact this is meant to be used only on `aws`.
 
-1. Upload a javascript file to a static server or CDN, such as AWS S3, Azure Storage, Digital Ocean Spaces, or similar.
-2. Make an HTTP request (e.g. via `curl` or `httpie`) to modify an existing import map to point to the new file.
+Since some companies nowadays are based on top of `serverless architecture` I've migrated what was needed to deploy this app as an `AWS lambda`.
 
-These two steps are often performed during a CI process, to automate deployments of frontend code.
-
-<img src="https://drive.google.com/uc?id=1tkDltyzV-jpVLT9U5DvRDfslPyiEAB6y" alt="import-map-deployer demo">
+This doesn't intend to replace the original `import-map-deployer`.
 
 ## Installation and usage
-#### Docker
-import-map-deployer is available on DockerHub as canopytax/import-map-deployer. If you want to run just the single container,
-you can run `docker-compose up` from the project root. When running via docker-compose, it will mount a volume in the project root's directory,
-expecting a `config.json` file to be present.
-
-#### Node
-To run the import-map-deployer in Node, run the following command:
-`npx import-map-deployer config.json`
+`yarn install`
+`yarn start`
+`yarn deploy`
 
 ## Configuration file
-The import-map-deployer expects a configuration file to be present so it (1) can password protect deployments, and (2) knows where and how
+The `aws-lambda-import-map-deployer` expects a configuration file to be present so it (1) can password protect deployments, and (2) knows where and how
 to download and update the "live" import map.
-
-If no configuration file is present, import-map-deployer defaults to using the filesystem to host the manifest file, which is called `sofe-manifest.json` and created in the current working directory. If username and password are included, http basic auth will be required. If username and password is not provided, no http auth will be needed.
 
 Here are the properties available in the config file:
 - `manifestFormat` (required): A string that is either `"importmap"` or `"sofe"`, which indicates whether the import-map-deployer is
@@ -33,24 +22,16 @@ Here are the properties available in the config file:
   a local file called `import-map.json` that will be used as the import map. The keys in the `locations` object are the names of environments, and the values are
   strings that indicate how the import-map-deployer should interact with the import map for that environment. For more information on the possible string values for locations, see the
   [Built-in IO Methods](#built-in-io-methods) section.
-- `username` (optional): The username for HTTP auth when calling the import-map-deployer. If username and password are omitted, anyone can update the import map without authenticating. This
+- `username` (required): The username for HTTP auth when calling the import-map-deployer. If username and password are omitted, anyone can update the import map without authenticating. This
   username *is not* related to authenticating with S3/Digital Ocean/Other, but rather is the username your CI process will use in its HTTP request to the import-map-deployer.
-- `password` (optional): The password for HTTP auth when calling the import-map-deployer. If username and password are omitted, anyone can update the import map without authenticating. This
+- `password` (required): The password for HTTP auth when calling the import-map-deployer. If username and password are omitted, anyone can update the import map without authenticating. This
   password *is not* related to authenticating with S3/Digital Ocean/Other, but rather is the password your CI process will use in its HTTP request to the import-map-deployer.
 - `region` (optional): The [AWS region](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html) to be used when retrieving and updating the import map.
   This can also be specified via the [AWS_DEFAULT_REGION environment variable](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html), which is the preferred method.
 - `s3Endpoint` (optional): The url for aws-sdk to call when interacting with S3. Defaults to AWS' default domain, but can be configured for
 Digital Ocean Spaces or other S3-compatible APIs.
-- `readManifest(env)` (optional): A javascript function that will be called to read the import map. One argument is provided, a string `env` indicating
-  which location to read from. This allows you to implement your own way of reading the import map. The function must return
-  a Promise that resolves with the import map as a **string**. Since javascript functions are not part of JSON, this option is only available if you provide a config.js file (instead
-  of config.json).
-- `writeManifest(importMapAsString, env)` (optional): A javascript function that will be called to write the import map. Two arguments are provided, 
-  the first being the import map as a string to be written, and the second is the string `env` that should be updated. This allows you to implement your
-  own way of writing the import map. The function must return a Promise that resolves with the import map as an object. Since javascript functions are
-  not part of JSON, this option is only available if you provide a config.js file (instead of config.json).
 
-### Option 1: json file
+### json file
 The below configuration file will set up the import-map-deployer to do the following:
 
 - Requests to import-map-deployer must use HTTP auth with the provided username and password.
@@ -61,39 +42,11 @@ The below configuration file will set up the import-map-deployer to do the follo
 {
   "username": "admin",
   "password": "1234",
-  "manifestFormat": "importmap|sofe",
+  "manifestFormat": "importmap",
   "locations": {
     "default": "import-map.json",
     "prod": "s3://cdn.canopytax.com/import-map.json",
     "test": "import-map-test.json"
-  }
-}
-```
-
-### Option 2: javascript module
-Example config.js
-```js
-// config.js
-exports = {
-  // The username that must be provided via HTTP auth when calling the import-map-deployer
-  username: "admin",
-  // The password that must be provided via HTTP auth when calling the import-map-deployer
-  password: "1234",
-  // The type of json file that should be updated. Import-maps are two ways of defining URLs for javascript module.
-  manifestFormat: "importmap|sofe",
-  // Optional, if you are using a built-in "IO Method"
-  readManifest: function(env) {
-    return new Promise((resolve, reject) => {
-      const manifest = ''; //read a string from somewhere
-      resolve(manifest); //must resolve a string
-    });
-  },
-  // Optional, if you are using a built-in "IO Method"
-  writeManifest: function() {
-    return new Promise((resolve, reject) => {
-      //write the file....
-      resolve(); //you don't have to call resolve with any value
-    }
   }
 }
 ```
@@ -116,72 +69,6 @@ config.json:
   "manifestFormat": "importmap",
   "locations": {
     "prod": "s3://mycdn.com/import-map.json",
-  }
-}
-```
-
-### Digital Ocean Spaces
-If your import map json file is hosted by Digital Ocean Spaces, you can use the import-map-deployer to modify the import map file
-by specifying in your config `spaces://` in the `locations` config object.
-
-The format of the string is `spaces://bucket-name.digital-ocean-domain-stuff.com/file-name.json`. Note that the name of the Bucket
-is everything after `spaces://` and before the first `.` character.
-
-Since the API Digital Ocean Spaces is compatible with the AWS S3 API, import-map-deployer uses `aws-sdk` to communicate with Digital Ocean Spaces. As such,
-all options that can be passed for AWS S3 also are applied to Digital Ocean Spaces. You need to provide
-[AWS CLI environment variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html) for authentication with Digital Ocean Spaces, since
-import-map-deployer is using `aws-sdk` to communicate with Digital Ocean.
-
-Instead of an AWS region, you should provide an `s3Endpoint` config value that points to a Digital Ocean region.
-
-config.json:
-```json
-{
-  "manifestFormat": "importmap",
-  "s3Endpoint": "https://nyc3.digitaloceanspaces.com",
-  "locations": {
-    "prod": "spaces://mycdn.com/import-map.json",
-  }
-}
-```
-
-### Azure Storage
-Note, that you must have environment variables `AZURE_STORAGE_ACCOUNT` and `AZURE_STORAGE_ACCESS_KEY`, or `AZURE_STORAGE_CONNECTION_STRING` defined for authentication.
-
-config.json:
-```json
-{
-  "manifestFormat": "importmap",
-  "locations": {
-    "prod": {
-      "azureContainer": "static",
-      "azureBlob": "importmap.json"
-    },
-  }
-}
-```
-
-### Google Cloud Storage
-Note that you must have the `GOOGLE_APPLICATION_CREDENTIALS` environment variable set for authentication.
-
-config.json:
-```json
-{
-  "manifestFormat": "importmap",
-  "locations": {
-    "prod": "google://name-of-bucket/importmap.json"
-  }
-}
-```
-
-### File system
-If you'd like to store the import map locally on the file system, provide the name of a file in your `locations` instead.
-
-```json
-{
-  "manifestFormat": "importmap",
-  "locations": {
-    "prod": "prod-import-map.json",
   }
 }
 ```

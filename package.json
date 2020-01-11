@@ -1,9 +1,9 @@
 {
-  "name": "import-map-deployer",
+  "name": "aws-lambda-import-map-deployer",
   "version": "0.0.1",
-  "description": "a manifest deployer for systemjs",
+  "description": "an aws-lambda manifest deployer for systemjs",
   "scripts": {
-    "dev": "sls offline start --port 4500",
+    "start": "sls offline start --port 4500",
     "deploy": "sls deploy"
   },
   "dependencies": {

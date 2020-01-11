@@ -1,11 +1,11 @@
 {
   "manifestFormat": "importmap",
   "region": "eu-west-1",
-  "username": "d4rthv4d3r",
-  "password": "D^Ym83zR92q79kOzf*n",
+  "username": "{YOUR_USERNAME}",
+  "password": "{YOUR_PASSWORD}",
   "locations": {
-    "default": "s3://mfe-portal-3c8600/import-map-dev.json",
-    "prod": "s3://mfe-portal-3c8600/import-map.json",
-    "test": "s3://mfe-portal-3c8600/import-map-test.json"
+    "default": "s3://{YOUR_BUCKET}/import-map-dev.json",
+    "prod": "s3://{YOUR_BUCKET}/import-map.json",
+    "test": "s3://{YOUR_BUCKET}/import-map-test.json"
   }
 }
